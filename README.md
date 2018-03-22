@@ -118,7 +118,7 @@ slamar => { last: 'Lamar', first: 'Spencer', born: 1977 }
 
 ```
 
-If you run the command repeatedly with the -R option, it will create more records.
+If you run the command repeatedly with the -C option, it will create more records.
 You can also confirm the data you've got by reading all the records in the toy database, like this:
 ```
 node ./tools/dataLoader.js -K ${JSON_KEY_FILE} -R
