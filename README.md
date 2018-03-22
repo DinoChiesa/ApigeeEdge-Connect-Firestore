@@ -3,7 +3,9 @@
 This code shows how to connect to a Firestore DB from within Apigee Edge.
 
 There are two versions of basically the same code here.
-one running in trireme, one in "hosted functions".  (Your org must suport Hosted Functions, for this to work.)
+
+one running in trireme, one in "hosted functions". For the latter to
+work, your org must suport Hosted Functions.
 
 Both connect to Firebase/Firestore.
 
@@ -15,24 +17,40 @@ To set up, you need a Firestore DB, and you need some sample data in it.
 Then you need to copy your key into the API Proxy bundles directories, and then import and deploy the
 proxy bundles.
 
+The following will guide you in more detail:
+
 
 ### 1. Create a Firestore Database
 
 1. go to firebase.google.com
-2. signin
-3. create new project
+2. sign in
+3. add a project, name it
 
-4. go to pantheon (https://pantheon.corp.google.com/)
+4. on the left-hand-side navigator, click "Database"
 
-5. select the firebase project
-6. select "Service Accounts" on the Left hand side
+5. In the Database section, click "Cloud Firestore Beta."
+   This also creates a service account and enables the API in the Cloud API Manager.
 
-7. There's an existing service account
-8. Create new key
-9. JSON
-10. download the JSON key file. Remember the location.
+6. Start in locked mode
 
-The JSON key file will look like this:
+7. in a new tab, go to pantheon (https://pantheon.corp.google.com/)
+
+8. select the firebase project you just created
+
+9. Use the left-hand-side navigator to click to "IAM & admin"... Service Accounts
+
+10. You will see "App Engine Service Account"...
+   It will say that there are no keys for this account.
+   Far to the right, click the three dots, and click "Create key"
+
+11. JSON
+
+12. Create
+
+13. The JSON key is downloaded automatically to your computer.
+
+
+The contents of the JSON key file will look like this:
 
 ```
 {
@@ -47,13 +65,23 @@ The JSON key file will look like this:
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/blah-blah-blah@gserviceaccount.com"
 }
-
 ```
 
+For more information on provisioning a Cloud Firestore DB, see [the quickstart](https://firebase.google.com/docs/firestore/quickstart).
 
 ### 2. Initialize the Tools
 
-You need to have node and npm already installed on your workstation to use the command-line tools included in this repo. If you don't have them, go get them now.
+You need to have node and npm already installed on your workstation to
+use the command-line tools included in this repo. If you don't have
+them, install them now. On MacOS, if you have homebrew (recommended), this may be as simple as:
+
+```
+brew update
+brew install node
+brew install npm
+```
+
+After you have node and npm, continue here to install the pre-requisite NPM modules for the tools:
 
 ```
 cd tools
@@ -63,18 +91,40 @@ cd ..
 
 ### 3. Load some sample Data into the Firestore Database
 
+Use the command-line tool to load some random data into your new Firestore database.
+
 ```
 JSON_KEY_FILE=PATH_TO_YOUR_JSON_KEY_FILE
 node ./tools/dataLoader.js -K ${JSON_KEY_FILE} -C
 ```
 
-You can confirm that you've got data by reading all the records in this toy database:
+If successful, the output of the command will be like this:
 ```
-JSON_KEY_FILE=PATH_TO_YOUR_JSON_KEY_FILE
+Apigee Edge Firestore demo data loader tool, version: 20180322-0743
+Node.js v7.7.1
+
+ablack => { last: 'Black', first: 'Adam', born: 1921 }
+afletcher => { last: 'Fletcher', first: 'Audrey', born: 1987 }
+bcrosby => { last: 'Crosby', first: 'Baba', born: 1985 }
+bsmith => { last: 'Smith', first: 'Barry', born: 1982 }
+cflanders => { first: 'Charlene', born: 1954, last: 'Flanders' }
+hblack => { last: 'Black', first: 'Harry', born: 1963 }
+hcerruti => { last: 'Cerruti', first: 'Humphrey', born: 1989 }
+jflanders => { last: 'Flanders', first: 'Julia', born: 1997 }
+jroosevelt => { last: 'Roosevelt', first: 'Jose', born: 1939 }
+jsmith => { first: 'Jose', born: 1936, last: 'Smith' }
+pspruance => { first: 'Penelope', born: 1976, last: 'Spruance' }
+slamar => { last: 'Lamar', first: 'Spencer', born: 1977 }
+
+```
+
+If you run the command repeatedly with the -R option, it will create more records.
+You can also confirm the data you've got by reading all the records in the toy database, like this:
+```
 node ./tools/dataLoader.js -K ${JSON_KEY_FILE} -R
 ```
 
-The output will list all of the records in the sample database.
+The output will list all of the records in the sample database. Something like this:
 
 ```
 Apigee Edge Firestore demo data loader tool, version: 20180322-0743
@@ -113,15 +163,15 @@ Make sure there is exactly one JSON file in each of those directories.
 ORG=YOUR_ORG_NAME
 ENV=YOUR_ENV_NAME
 APIGEEUSER=YOUR_APIGEE_ADMIN_USER_NAME
-node ./tools/importAndDeploy.js -v -o ${ORG} -e ${ENV} -d ./proxy-bundles/connect-firestore-hf
-node ./tools/importAndDeploy.js -v -o ${ORG} -e ${ENV} -d ./proxy-bundles/connect-firestore-node
+node ./tools/importAndDeploy.js -v -u ${APIGEEUSER} -o ${ORG} -e ${ENV} -d ./proxy-bundles/connect-firestore-hf
+node ./tools/importAndDeploy.js -v -u ${APIGEEUSER} -o ${ORG} -e ${ENV} -d ./proxy-bundles/connect-firestore-node
 ```
 
 The script will prompt you for your password.
 
 Deployment of the Hosted Functions example takes a few moments.
 
-> It may be necessary to undeploy and redeploy the HF proxy. HF is in beta release at this time.
+> NB: It may be necessary to undeploy and redeploy the HF proxy. HF is in beta release at this time.
 
 
 ## Invoking the Proxy

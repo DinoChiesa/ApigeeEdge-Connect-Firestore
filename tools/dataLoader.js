@@ -15,12 +15,13 @@
 // limitations under the License.
 //
 // created: Thursday, 22 March 2018, 07:20
-// last saved: <2018-March-22 07:43:37>
+// last saved: <2018-March-22 09:46:24>
 
 (function (){
   'use strict';
   const Getopt = require('node-getopt');
-  const version = '20180322-0743';
+  const path = require('path');
+  const version = '20180322-0946';
   const getopt = new Getopt([
     ['K' , 'jsonkeyfile=ARG', 'Required. the file containing the JSON Key downloaded from google.'],
     ['C' , 'create', 'Optional. Tells the script to create some random records.'],
@@ -33,7 +34,8 @@
   var opt, usersCollection;
 
   function initializeFirestoreClient (collectionName) {
-    var serviceAccount = require(opt.options.jsonkeyfile);
+    var keyfilepath =  path.resolve(opt.options.jsonkeyfile);
+    var serviceAccount = require(keyfilepath);
     firebase.initializeApp({
       credential: firebase.credential.cert(serviceAccount)
     });
