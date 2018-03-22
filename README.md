@@ -1,6 +1,6 @@
 # Connecting to Firestore
 
-This code shows how to connect to a Firestore DB from within Apigee Edge. 
+This code shows how to connect to a Firestore DB from within Apigee Edge.
 
 There are two versions of basically the same code here.
 one running in trireme, one in "hosted functions".  (Your org must suport Hosted Functions, for this to work.)
@@ -10,7 +10,7 @@ Both connect to Firebase/Firestore.
 
 ## Setup
 
-To set up, you need a Firestore DB, and you need some sample data in it. 
+To set up, you need a Firestore DB, and you need some sample data in it.
 
 Then you need to copy your key into the API Proxy bundles directories, and then import and deploy the
 proxy bundles.
@@ -53,7 +53,7 @@ The JSON key file will look like this:
 
 ### 2. Initialize the Tools
 
-You need to have node and npm already installed on your workstation to use the command-line tools included in this repo. If you don't have them, go get them now. 
+You need to have node and npm already installed on your workstation to use the command-line tools included in this repo. If you don't have them, go get them now.
 
 ```
 cd tools
@@ -68,7 +68,7 @@ JSON_KEY_FILE=PATH_TO_YOUR_JSON_KEY_FILE
 node ./tools/dataLoader.js -K ${JSON_KEY_FILE} -C
 ```
 
-You can confirm that you've got data by reading all the records in this toy database: 
+You can confirm that you've got data by reading all the records in this toy database:
 ```
 JSON_KEY_FILE=PATH_TO_YOUR_JSON_KEY_FILE
 node ./tools/dataLoader.js -K ${JSON_KEY_FILE} -R
@@ -94,9 +94,14 @@ dfletcher => { last: 'Fletcher', first: 'Darlene', born: 1991 }
 
 ### 4. Copy your JSON key file
 
+Copy the key to both API Proxy bundles.
+NB: This is a bug. These keys should ideally be provisioned into the Encrypted KVM.
+
 ```
-cp ${JSON_KEY_FILE} proxy-bundles/connect-firestore-hf/apiproxy/resources/hosted/keys
-cp ${JSON_KEY_FILE} proxy-bundles/connect-firestore-node/apiproxy/resources/node/keys
+mkdir ./proxy-bundles/connect-firestore-hf/apiproxy/resources/hosted/keys
+mkdir ./proxy-bundles/connect-firestore-node/apiproxy/resources/node/keys
+cp ${JSON_KEY_FILE} ./proxy-bundles/connect-firestore-hf/apiproxy/resources/hosted/keys
+cp ${JSON_KEY_FILE} ./proxy-bundles/connect-firestore-node/apiproxy/resources/node/keys
 ```
 
 Make sure there is exactly one JSON file in each of those directories.
@@ -112,11 +117,11 @@ node ./tools/importAndDeploy.js -v -o ${ORG} -e ${ENV} -d ./proxy-bundles/connec
 node ./tools/importAndDeploy.js -v -o ${ORG} -e ${ENV} -d ./proxy-bundles/connect-firestore-node
 ```
 
-The script will prompt you for your password. 
+The script will prompt you for your password.
 
 Deployment of the Hosted Functions example takes a few moments.
 
-> It may be necessary to undeploy and redeploy the HF proxy. HF is in beta release at this time. 
+> It may be necessary to undeploy and redeploy the HF proxy. HF is in beta release at this time.
 
 
 ## Invoking the Proxy
@@ -129,8 +134,8 @@ Deployment of the Hosted Functions example takes a few moments.
    curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-node
    ```
    This will retrieve a page of records from the database.
-   
-   
+
+
 2. If you want to retrieve a particular user record:
 
    ```
