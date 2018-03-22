@@ -1,0 +1,19 @@
+{
+  "name": "connect-firestore-hf",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "dino chiesa <dchiesa@google.com>",
+  "license": "Apache-2.0",
+  "description": "Hello World Firestore Application",
+  "dependencies": {
+    "express": "^4.16.2",
+    "jsonwebtoken": "^8.1.0",
+    "querystring": "^0.2.0",
+    "request": "^2.83.0",
+    "sprintf-js": "^1.0.3",
+    "url-join": "^2.0.2"
+  }
+}
