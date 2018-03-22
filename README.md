@@ -227,14 +227,13 @@ Deployment of the Hosted Functions example takes a few moments.
    You should see a happy message in reply.
 
 
-## How it works
+## How it Works
 
 There are two versions of the API Proxy here. Both use JavaScript / Node code to connect into Firestore.
 
 One relies on the legacy "Trireme" node runtime, and the other relies on Hosted Functions.
 
-In both cases, authentication to firestore is done with a RFC7523 grant
-- basically the client (the node code running inside Apigee Edge)
+In both cases, authentication to firestore is done via OAuth Bearer token, and the node logic obtains the token via  a RFC7523 grant. This means: The client (the node code running inside Apigee Edge)
 generates a self-signed JWT and sends that to googleapis.com to request
 an access token.  Googleapis.com responds with an access token and then
 the reads from the Firestore database just pass that token as a regular
@@ -243,6 +242,12 @@ OAuth Bearer token in the Authorization header.
 That access token expires, so there's a setTimeout() loop in the node
 code to refresh the access token periodically.
 
+The requests sent to Cloud Firestore just use the Firestore REST API.  The reads look like this:
+
+```
+ curl -i -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+  https://firestore.googleapis.com/v1beta1/projects/${FIRESTORE_PROJECT}/databases/\(default\)/documents/users/pwhite
+```
 
 ## License
 
