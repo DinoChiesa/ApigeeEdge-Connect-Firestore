@@ -2,10 +2,10 @@
 
 This code shows how to connect to a Firestore DB from within Apigee Edge.
 
-There are two versions of basically the same code here.
+There are two versions of basically (but not exactly) the same code here.
 
-one running in trireme, one in "hosted functions". For the latter to
-work, your org must suport Hosted Functions.
+One running in trireme, one in ["hosted targets"](https://community.apigee.com/articles/56200/using-nodejs-with-apigee-you-should-check-out-host.html). For the latter to
+work, your org must support Hosted Targets.
 
 Both connect to Firebase/Firestore.
 
@@ -33,9 +33,9 @@ The following will guide you in more detail:
 
 6. Start in locked mode
 
-7. in a new tab, go to pantheon (https://pantheon.corp.google.com/)
+7. in a new tab, go to the [GCP Console](https://pantheon.corp.google.com/)
 
-8. select the firebase project you just created
+8. select the Firebase project you just created
 
 9. Use the left-hand-side navigator to click to "IAM & admin"... Service Accounts
 
@@ -73,7 +73,9 @@ For more information on provisioning a Cloud Firestore DB, see [the quickstart](
 
 You need to have node and npm already installed on your workstation to
 use the command-line tools included in this repo. If you don't have
-them, install them now. On MacOS, if you have homebrew (recommended), this may be as simple as:
+them, install them now. Get a recent version, probably the most recent
+version. On MacOS, if you have homebrew (recommended), this may be as
+simple as:
 
 ```
 brew update
@@ -144,8 +146,10 @@ dfletcher => { last: 'Fletcher', first: 'Darlene', born: 1991 }
 
 ### 4. Copy your JSON key file
 
-Copy the key to both API Proxy bundles.
-NB: This is a bug. These keys should ideally be provisioned into the Encrypted KVM.
+Copy the key to both API Proxy bundles.  NB: This is a security
+bug. Don't do this for a production system. This is done only to keep
+provisioning of this example, very simple. For a production system,
+these keys should be provisioned into the Encrypted KVM.
 
 ```
 mkdir ./proxy-bundles/connect-firestore-hf/apiproxy/resources/hosted/keys
@@ -231,13 +235,15 @@ Deployment of the Hosted Functions example takes a few moments.
 
 There are two versions of the API Proxy here. Both use JavaScript / Node code to connect into Firestore.
 
-One relies on the legacy "Trireme" node runtime, and the other relies on Hosted Functions.
+One relies on the legacy "Trireme" node runtime, and the other relies on Hosted Targets.
 
-In both cases, authentication to firestore is done via OAuth Bearer token, and the node logic obtains the token via  a RFC7523 grant. This means: The client (the node code running inside Apigee Edge)
-generates a self-signed JWT and sends that to googleapis.com to request
-an access token.  Googleapis.com responds with an access token and then
-the reads from the Firestore database just pass that token as a regular
-OAuth Bearer token in the Authorization header.
+In both cases, authentication to firestore is done via OAuth Bearer
+token, and the node logic obtains the token via a RFC7523 grant. This
+means: The client (the node code running inside Apigee Edge) generates a
+self-signed JWT and sends that to googleapis.com to request an access
+token.  Googleapis.com responds with an access token and then the reads
+from the Firestore database just pass that token as a regular OAuth
+Bearer token in the Authorization header.
 
 That access token expires, so there's a setTimeout() loop in the node
 code to refresh the access token periodically.

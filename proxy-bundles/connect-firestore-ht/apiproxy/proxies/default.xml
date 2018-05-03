@@ -12,7 +12,7 @@
     </PostFlow>
     <Flows/>
     <HTTPProxyConnection>
-        <BasePath>/connect-firestore-hf</BasePath>
+        <BasePath>/connect-firestore-ht</BasePath>
         <Properties/>
         <VirtualHost>secure</VirtualHost>
     </HTTPProxyConnection>
