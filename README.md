@@ -257,7 +257,7 @@ The requests sent to Cloud Firestore just use the Firestore REST API.  The reads
 
 ## License
 
-This material is Copyright 2018 Google Inc.
+This material is Copyright 2018 Google LLC.
 and is licensed under the [Apache 2.0 License](LICENSE).
 
 

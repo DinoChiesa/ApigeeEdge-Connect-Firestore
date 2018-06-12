@@ -8,10 +8,10 @@
 // Derived from https://github.com/mikeal/request.
 //
 // created: Fri Aug  2 21:21:03 2013
-// last saved: <2017-October-24 14:01:21>
+// last saved: <2018-June-12 15:01:58>
 // ------------------------------------------------------------------
 //
-// Copyright © 2013 Dino Chiesa, 2017 Google Inc
+// Copyright © 2013 Dino Chiesa, 2017 Google LLC.
 // All rights reserved.
 //
 // ------------------------------------------------------------------

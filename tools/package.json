@@ -9,8 +9,8 @@
   "author": "Dino Chiesa <dchiesa@google.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "apigee-edge-js": "^0.2.27",
-    "sprintf-js": "^1.0.3",
+    "apigee-edge-js": "^0.3.7",
+    "sprintf-js": "^1.1.1",
     "firebase-admin": "^5.11.0",
     "node-getopt": "^0.3.1"
   },

@@ -1,6 +1,6 @@
 // dataLoader.js
 //
-// Copyright 2018 Google Inc.
+// Copyright 2018 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 // created: Thursday, 22 March 2018, 07:20
-// last saved: <2018-March-22 09:46:24>
+// last saved: <2018-June-12 15:00:20>
 
 (function (){
   'use strict';
