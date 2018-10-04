@@ -163,6 +163,8 @@ Make sure there is exactly one JSON file in each of those directories.
 
 ### 4. Import and Deploy the Bundles
 
+You don't need to deploy *both* bundles. Deploy one or both depending on what uou're interested in testing or demonstrating.
+
 ```
 ORG=YOUR_ORG_NAME
 ENV=YOUR_ENV_NAME
@@ -184,21 +186,28 @@ Deployment of the Hosted Functions example takes a few moments.
 
 ## Invoking the Proxy
 
-1. Invoke the proxy with:
+1. Invoke the proxy. If you are using the hosted targets proxy:
 
    ```
    curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-ht
+   ```
 
+   If you are using the nodejs/trireme version":"
+   ```
    curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-node
    ```
-   This will retrieve a page of records from the database.
+   Either command will retrieve a page of records from the database.
 
 
 2. If you want to retrieve a particular user record:
 
+   For HT:
    ```
    curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-ht/alovelace
+   ```
 
+   For nodejs/trireme:
+   ```
    curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-node/alovelace
    ```
 
@@ -227,9 +236,13 @@ Deployment of the Hosted Functions example takes a few moments.
    ```
 
 3. Loopback (healthcheck) request:
+   For HT:
    ```
    curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-ht/hello
-
+   ```
+   
+   For nodejs/trireme:
+   ```
    curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-node/hello
    ```
    You should see a happy message in reply.
