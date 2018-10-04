@@ -152,9 +152,9 @@ provisioning of this example, very simple. For a production system,
 these keys should be provisioned into the Encrypted KVM.
 
 ```
-mkdir ./proxy-bundles/connect-firestore-hf/apiproxy/resources/hosted/keys
+mkdir ./proxy-bundles/connect-firestore-ht/apiproxy/resources/hosted/keys
 mkdir ./proxy-bundles/connect-firestore-node/apiproxy/resources/node/keys
-cp ${JSON_KEY_FILE} ./proxy-bundles/connect-firestore-hf/apiproxy/resources/hosted/keys
+cp ${JSON_KEY_FILE} ./proxy-bundles/connect-firestore-ht/apiproxy/resources/hosted/keys
 cp ${JSON_KEY_FILE} ./proxy-bundles/connect-firestore-node/apiproxy/resources/node/keys
 ```
 
@@ -167,7 +167,11 @@ Make sure there is exactly one JSON file in each of those directories.
 ORG=YOUR_ORG_NAME
 ENV=YOUR_ENV_NAME
 APIGEEUSER=YOUR_APIGEE_ADMIN_USER_NAME
-node ./tools/importAndDeploy.js -v -u ${APIGEEUSER} -o ${ORG} -e ${ENV} -d ./proxy-bundles/connect-firestore-hf
+
+# deploy the version of the proxy that uses hosted targets
+node ./tools/importAndDeploy.js -v -u ${APIGEEUSER} -o ${ORG} -e ${ENV} -d ./proxy-bundles/connect-firestore-ht
+
+# deploy the version of the proxy that uses a nodejs target and trireme
 node ./tools/importAndDeploy.js -v -u ${APIGEEUSER} -o ${ORG} -e ${ENV} -d ./proxy-bundles/connect-firestore-node
 ```
 
@@ -175,7 +179,7 @@ The script will prompt you for your password.
 
 Deployment of the Hosted Functions example takes a few moments.
 
-> NB: It may be necessary to undeploy and redeploy the HF proxy. HF is in beta release at this time.
+> NB: It may be necessary to undeploy and redeploy the HT proxy. HT is in beta release at this time.
 
 
 ## Invoking the Proxy
@@ -183,7 +187,7 @@ Deployment of the Hosted Functions example takes a few moments.
 1. Invoke the proxy with:
 
    ```
-   curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-hf
+   curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-ht
 
    curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-node
    ```
@@ -193,7 +197,7 @@ Deployment of the Hosted Functions example takes a few moments.
 2. If you want to retrieve a particular user record:
 
    ```
-   curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-hf/alovelace
+   curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-ht/alovelace
 
    curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-node/alovelace
    ```
@@ -224,7 +228,7 @@ Deployment of the Hosted Functions example takes a few moments.
 
 3. Loopback (healthcheck) request:
    ```
-   curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-hf/hello
+   curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-ht/hello
 
    curl -i https://${ORG}-${ENV}.apigee.net/connect-firestore-node/hello
    ```
