@@ -179,9 +179,9 @@ node ./tools/importAndDeploy.js -v -u ${APIGEEUSER} -o ${ORG} -e ${ENV} -d ./pro
 
 The script will prompt you for your password.
 
-Deployment of the Hosted Functions example takes a few moments.
+Deployment of the Hosted Targets example takes a few moments.
 
-> NB: It may be necessary to undeploy and redeploy the HT proxy. HT is in beta release at this time.
+> NB: It may be necessary to undeploy and redeploy the HT proxy. HT is in beta release as of 2018 October 4.
 
 
 ## Invoking the Proxy
