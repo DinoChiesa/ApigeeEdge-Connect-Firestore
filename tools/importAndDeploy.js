@@ -18,42 +18,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// last saved: <2018-May-31 17:33:56>
+// last saved: <2019-February-11 12:48:38>
 
 const edgejs     = require('apigee-edge-js'),
       common     = edgejs.utility,
       apigeeEdge = edgejs.edge,
       sprintf    = require('sprintf-js').sprintf,
       Getopt     = require('node-getopt'),
-      version    = '20180531-1645',
+      version    = '20190211-1248',
       defaults   = { basepath : '/' },
       getopt     = new Getopt(common.commonOptions.concat([
         ['d' , 'source=ARG', 'source directory for the proxy files. Should be parent of dir "apiproxy" or "sharedflowbundle"'],
         ['N' , 'name=ARG', 'override the name for the API proxy or shared flow. By default it\'s extracted from the XML file.'],
         ['e' , 'env=ARG', 'the Edge environment(s) to which to deploy the asset. Separate multiple environments with a comma.'],
         ['b' , 'basepath=ARG', 'basepath for deploying the API Proxy. Default: ' + defaults.basepath + '  Does not apply to sf.'],
-        ['S' , 'sharedflow', 'import and deploy as a sharedflow. Default: import + deploy a proxy.'],
-        ['T' , 'notoken', 'optional. do not try to get a authentication token.']
+        ['S' , 'sharedflow', 'import and deploy as a sharedflow. Default: import + deploy a proxy.']
       ])).bindHelp();
 
 // ========================================================
-
-function promisifyDeployment(collection, options) {
-  return function deploy(env) {
-    return new Promise(function(resolve, reject) {
-      options.environment = env;
-      collection.deploy(options, function(e, result) {
-        if (e) {
-          common.logWrite(JSON.stringify(e, null, 2));
-          if (result) { common.logWrite(JSON.stringify(result, null, 2)); }
-          reject(e);
-        }
-        common.logWrite('deploy ok.');
-        resolve();
-      });
-    });
-  };
-}
 
 console.log(
   'Apigee Edge Proxy/Sharedflow Import + Deploy tool, version: ' + version + '\n' +
@@ -78,68 +60,48 @@ if (opt.options.basepath && opt.options.sharedflow) {
 
 common.verifyCommonRequiredParameters(opt.options, getopt);
 
-var options = {
-      mgmtServer: opt.options.mgmtserver,
-      org : opt.options.org,
-      user: opt.options.username,
-      password: opt.options.password,
-      no_token: opt.options.notoken,
-      verbosity: opt.options.verbose || 0
-    };
+apigeeEdge.connect(common.optToOptions(opt))
+  .then( (org) => {
+    common.logWrite('connected');
 
-apigeeEdge.connect(options, function(e, org){
-  if (e) {
-    common.logWrite(JSON.stringify(e, null, 2));
-    process.exit(1);
-  }
-  common.logWrite('connected');
+    const collection = (opt.options.sharedflow) ? org.sharedflows : org.proxies;
+    const term = (opt.options.sharedflow) ? 'sharedflow' : 'proxy';
 
-  var collection = (opt.options.sharedflow) ? org.sharedflows : org.proxies;
-  var term = (opt.options.sharedflow) ? 'sharedflow' : 'proxy';
+    common.logWrite('importing a %s', term);
+    collection.import({name:opt.options.name, source:opt.options.source})
+      .then( (result) => {
+        if (result.error){
+          common.logWrite('error');
+          console.log(result.error.stack);
+          console.log(result.result);
+          return ;
+        }
+        common.logWrite(sprintf('import ok. %s name: %s r%d', term, result.name, result.revision));
+        let envs = opt.options.env || process.env.ENV;
+        if (envs) {
+          // env may be a comma-separated list
+          let options = { name: result.name, revision: result.revision };
+          if ( ! opt.options.sharedflow) {
+            options.basepath = opt.options.basepath || defaults.basepath;
+          }
 
-  common.logWrite('importing');
-  collection.import({name:opt.options.name, source:opt.options.source}, function(e, result) {
-    if (e) {
-      common.logWrite('error: ' + JSON.stringify(e, null, 2));
-      if (result) { common.logWrite(JSON.stringify(result, null, 2)); }
-      //console.log(e.stack);
-      process.exit(1);
-    }
-    common.logWrite(sprintf('import ok. %s name: %s r%d', term, result.name, result.revision));
-    var env = opt.options.env || process.env.ENV;
-    if (env) {
-      // env may be a comma-separated list
-      var options = {
-            name: result.name,
-            revision: result.revision,
-          };
-      if ( ! opt.options.sharedflow) {
-        options.basepath = opt.options.basepath || defaults.basepath;
-      }
+          // this magic deploys to each environment in series
+          const reducer = (promise, env) =>
+            promise .then( () =>
+                           collection
+                             .deploy(Object.assign(options, { environment:env }))
+                             .then( (result) => common.logWrite('deployment ' + ((result.error) ? 'failed: ' + JSON.stringify(result) : 'ok.') ))
+                         );
 
-      // this magic deploys to each environment in series
-      var deployIt = promisifyDeployment(collection, options);
-      var reducer = function (promise, env) {
-            return promise.then(() => {
-              return deployIt(env).then(result => results.push(result));
-            })
-            .catch(console.error);
-          };
-      let results = [];
-      var p = env.split(',')
-        .reduce(reducer, Promise.resolve())
-        .then(() => { common.logWrite('all done...'); })
-        .catch(console.error);
-
-      // Promise.all(opt.options.env.split(',').forEach(deployIt))
-      //   .then(() => { common.logWrite('all don...'); })
-      //  .catch((data) => {
-      //    console.log(data);
-      //  });
-    }
-    else {
-      common.logWrite('not deploying...');
-      common.logWrite('finish');
-    }
-  });
-});
+          return envs.split(',')
+            .reduce(reducer, Promise.resolve())
+            .then( () => common.logWrite('all done...') );
+            //.catch( (e) => console.error('error: ' + e.stack) );
+        }
+        else {
+          common.logWrite('not deploying...');
+          common.logWrite('finish');
+        }
+      });
+  })
+  .catch( (e) => { console.error('error: ' + e.error);} );

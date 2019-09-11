@@ -4,11 +4,28 @@ This code shows how to connect to a Firestore DB from within Apigee Edge.
 
 There are two versions of basically (but not exactly) the same code here.
 
-One running in trireme, one in ["hosted targets"](https://community.apigee.com/articles/56200/using-nodejs-with-apigee-you-should-check-out-host.html). For the latter to
-work, your org must support Hosted Targets.
+One running in trireme, one in ["hosted targets"](https://community.apigee.com/articles/56200/using-nodejs-with-apigee-you-should-check-out-host.html).
 
 Both connect to Firebase/Firestore.
 
+NB: As of October 2019, Trireme is deprecated, in Edge SaaS.
+
+## Motivation
+
+The reason we use a HT or Trireme module to interface between Apigee and Firestore is to perform
+token management. The token needed for Firestore expires, and if we want to periodically refresh the
+token, an easy way to do it is using the setTimeout() in JS.
+
+Of course it's also possible to perform token maintenance inline in the Apigee Proxy -
+
+1. check the expiry of the token
+2. if expired ask for a new one.
+3. cache it with the right expiry
+4. then invoke firestore.
+
+This means that one call in N will incur the cost of refreshing the token. Also there's an inherent race condition.
+A better way to do it would be to have overlapping tokens and some way of updating the token that is NOT being used.
+This needs more thought.
 
 ## Setup
 
@@ -26,14 +43,15 @@ The following will guide you in more detail:
 2. sign in
 3. add a project, name it
 
-4. on the left-hand-side navigator, click "Database"
+4. Visit [Firestore](https://firebase.google.com/products/firestore/) and click "visit console"
 
-5. In the Database section, click "Cloud Firestore Beta."
+5. select your new project.
+
+6. In the left-hand side navigator, select "Database".
+   In the upper banner, select "Cloud Firestore."
    This also creates a service account and enables the API in the Cloud API Manager.
 
-6. Start in locked mode
-
-7. in a new tab, go to the [GCP Console](https://pantheon.corp.google.com/)
+7. in a new tab, go to the [GCP Console](https://console.cloud.google.com/)
 
 8. select the Firebase project you just created
 
@@ -80,10 +98,9 @@ simple as:
 ```
 brew update
 brew install node
-brew install npm
 ```
 
-After you have node and npm, continue here to install the pre-requisite NPM modules for the tools:
+After you have node, continue here to install the pre-requisite NPM modules for the tools:
 
 ```
 cd tools
@@ -100,7 +117,7 @@ JSON_KEY_FILE=PATH_TO_YOUR_JSON_KEY_FILE
 node ./tools/dataLoader.js -K ${JSON_KEY_FILE} -C
 ```
 
-If successful, the output of the command will be like this:
+If successful, the output of the command will be something like this:
 ```
 Apigee Edge Firestore demo data loader tool, version: 20180322-0743
 Node.js v7.7.1
@@ -163,7 +180,7 @@ Make sure there is exactly one JSON file in each of those directories.
 
 ### 4. Import and Deploy the Bundles
 
-You don't need to deploy *both* bundles. Deploy one or both depending on what uou're interested in testing or demonstrating.
+You don't need to deploy *both* bundles. Deploy one or both depending on what you're interested in testing or demonstrating.
 
 ```
 ORG=YOUR_ORG_NAME

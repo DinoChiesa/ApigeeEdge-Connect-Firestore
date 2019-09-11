@@ -15,31 +15,33 @@
 // limitations under the License.
 //
 // created: Thursday, 22 March 2018, 07:20
-// last saved: <2018-June-12 15:00:20>
+// last saved: <2019-March-12 10:57:03>
+/* global process */
 
 (function (){
   'use strict';
-  const Getopt = require('node-getopt');
-  const path = require('path');
-  const version = '20180322-0946';
-  const getopt = new Getopt([
-    ['K' , 'jsonkeyfile=ARG', 'Required. the file containing the JSON Key downloaded from google.'],
-    ['C' , 'create', 'Optional. Tells the script to create some random records.'],
-    ['R' , 'read', 'Optional. Tells the script to read all the records.'],
-    ['h' , 'help', 'Displays this message.']
-  ]).bindHelp();
+  const Getopt        = require('node-getopt'),
+        firebase      = require('firebase-admin'),
+        dataGenerator = require('./lib/randomizer.js'),
+        path          = require('path'),
+        version       = '20180322-0946',
+        getopt        = new Getopt([
+          ['K' , 'jsonkeyfile=ARG', 'Required. the file containing the JSON Key downloaded from google.'],
+          ['C' , 'create', 'Optional. Tells the script to create some random records.'],
+          ['R' , 'read', 'Optional. Tells the script to read all the records.'],
+          ['h' , 'help', 'Displays this message.']
+        ]).bindHelp();
 
-  const firebase = require('firebase-admin');
-  const dataGenerator = require('./lib/randomizer.js');
   var opt, usersCollection;
 
-  function initializeFirestoreClient (collectionName) {
-    var keyfilepath =  path.resolve(opt.options.jsonkeyfile);
-    var serviceAccount = require(keyfilepath);
+  function initializeFirestoreClient(collectionName) {
+    let keyfilepath = path.resolve(opt.options.jsonkeyfile),
+        serviceAccount = require(keyfilepath);
     firebase.initializeApp({
-      credential: firebase.credential.cert(serviceAccount)
+      credential: firebase.credential.cert(serviceAccount),
+      timestampsInSnapshots: true
     });
-    var db = firebase.firestore();
+    let db = firebase.firestore();
     return db.collection(collectionName);
   }
 
@@ -50,24 +52,25 @@
     return usersCollection;
   }
 
-  function readOne(name) {
-    getUsersCollection().doc(name)
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists) {
-          console.log(snapshot.id, '=>', snapshot.data());
-        }
-      })
-      .catch((err) => {
-        console.log('Error getting document', err);
-      });
-  }
+  // function readOne(name) {
+  //   getUsersCollection().doc(name)
+  //     .get()
+  //     .then((snapshot) => {
+  //       if (snapshot.exists) {
+  //         console.log(snapshot.id, '=>', snapshot.data());
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.log('Error getting document', err);
+  //     });
+  // }
 
   function readAll() {
     getUsersCollection().get()
       .then((snapshot) => {
-        snapshot.forEach((doc) => {
+        snapshot.forEach( doc => {
           console.log(doc.id, '=>', doc.data());
+          //console.log('typeof born: ' + typeof doc.get('born'));
         });
       })
       .catch((err) => {
@@ -80,8 +83,8 @@
   }
 
   function createOne() {
-    var user = dataGenerator.generateRandomUserRegistration();
-    var docname = docnameFromUser(user);
+    let user = dataGenerator.generateRandomUserRegistration(),
+        docname = docnameFromUser(user);
     return getUsersCollection().doc(docname)
       .set(user);
   }

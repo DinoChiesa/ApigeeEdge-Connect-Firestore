@@ -1,7 +1,7 @@
 {
-  "name": "Tools for Dino's Apigee and Firestore demonstration",
-  "version": "1.0.1",
-  "description": "",
+  "name": "dchiesa-apigee-edge-firestore-example-tools",
+  "version": "1.0.2",
+  "description": "Tools for Dino's Apigee and Firestore demonstration",
   "main": "dataLoader.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,10 +9,10 @@
   "author": "Dino Chiesa <dchiesa@google.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "apigee-edge-js": "^0.3.7",
-    "sprintf-js": "^1.1.1",
-    "firebase-admin": "^5.11.0",
-    "node-getopt": "^0.3.1"
+    "apigee-edge-js": "^0.4.10",
+    "firebase-admin": "^7.0.0",
+    "node-getopt": "^0.3.1",
+    "sprintf-js": "^1.1.1"
   },
   "engines": {
     "node": "~7.7.1"

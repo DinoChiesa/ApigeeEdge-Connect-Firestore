@@ -1,19 +1,24 @@
+/* global process */
+/* jshint esversion: 9 */
+
 (function (){
   'use strict';
 
-  const httpRequest = require('request');
-  const app = require('express')();
-  const urljoin = require('url-join');
-  const jwt = require('jsonwebtoken');
-  const util = require('util');
-  const fs = require('fs');
-  const sprintf = require('sprintf-js').sprintf;
-  const querystring = require('querystring');
-  const gVersion = '20180322-0819';
-  const baseEndpoint = 'https://firestore.googleapis.com/v1beta1';
-  var serviceAccount;
-  var gAccessToken = null;
-  var defaultFirebaseScope = 'https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/datastore';
+  const httpRequest = require('request'),
+        app         = require('express')(),
+        urljoin     = require('url-join'),
+        jwt         = require('jsonwebtoken'),
+        util        = require('util'),
+        fs          = require('fs'),
+        sprintf     = require('sprintf-js').sprintf,
+        querystring = require('querystring');
+
+  const gVersion = '20180322-0819',
+        baseEndpoint = 'https://firestore.googleapis.com/v1beta1';
+
+  let serviceAccount,
+      gAccessToken = null,
+      defaultFirebaseScope = 'https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/datastore';
 
   //require('request-debug')(httpRequest);
 
@@ -35,6 +40,13 @@
       serviceAccount = require('./keys/' + keyFile);
     }
     return serviceAccount;
+  }
+
+  function scheduleTokenRefresh(tokenResponse) {
+    logWrite('assigning access token: ' + tokenResponse.access_token);
+    gAccessToken = tokenResponse.access_token;
+    var sleepTime = (tokenResponse.expires_in - 2 * 60) * 1000;
+    setTimeout(getToken, sleepTime);
   }
 
   function getToken(scope, cb) {
@@ -90,13 +102,6 @@
     });
   }
 
-  function scheduleTokenRefresh(tokenResponse) {
-    logWrite('assigning access token: ' + tokenResponse.access_token);
-    gAccessToken = tokenResponse.access_token;
-    var sleepTime = (tokenResponse.expires_in - 2 * 60) * 1000;
-    setTimeout(getToken, sleepTime);
-  }
-
   function xform(obj) {
     if (obj.documents) {
       obj.documents = obj.documents.map(xform);
@@ -119,10 +124,10 @@
   function getOneOrMore(request, response) {
     let uriPath = sprintf('projects/%s/databases/(default)/documents/users', getServiceAccount().project_id);
 
-    var endpoint = request.params.name ?
+    let endpoint = request.params.name ?
       urljoin(baseEndpoint, uriPath, request.params.name) :
       urljoin(baseEndpoint, uriPath);
-    var requestOptions = {
+    let requestOptions = {
           url: endpoint,
           method: 'get',
           headers : {
